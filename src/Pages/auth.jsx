@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   return (
@@ -18,9 +20,25 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const onSubmit = (event) => {
+  const [_, setCookies] = useCookies(["acces_token"]);
+
+  const navigate = useNavigate();
+
+  const onSubmit = async (event) => {
     event.preventDefault();
-    // Handle login submit logic here
+
+    try {
+      const response = await axios.post("http://localhost:3001/auth/login", {
+        username,
+        password,
+      });
+
+      setCookies("access_token", response.data.token);
+      window.localStorage.setItem("userID", response.data.userID);
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
