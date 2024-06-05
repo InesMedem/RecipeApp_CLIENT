@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const Auth = () => {
   return (
@@ -11,41 +12,16 @@ const Auth = () => {
 
 export default Auth;
 
+//! LOGIN
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  return (
-    <div className="auth-container">
-      <form>
-        <h2>LOGIN</h2>
-
-        <div className="form-group">
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            onChange={(event) => setUsername(event.target.value)}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="text"
-            id="username"
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  );
-};
-
-const Register = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const onSubmit = (event) => {
+    event.preventDefault();
+    // Handle login submit logic here
+  };
 
   return (
     <Form
@@ -53,10 +29,46 @@ const Register = () => {
       setUsername={setUsername}
       password={password}
       setPassword={setPassword}
-      label={label}
+      label="Login"
+      onSubmit={onSubmit}
+      idPrefix="login"
     />
   );
 };
+
+//! REGISTER
+
+const Register = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post("http://localhost:3001/auth/register", {
+        username,
+        password,
+      });
+      alert("Registration Completed! Now login.");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <Form
+      username={username}
+      setUsername={setUsername}
+      password={password}
+      setPassword={setPassword}
+      label="Register"
+      onSubmit={onSubmit}
+      idPrefix="register"
+    />
+  );
+};
+
+//! COMPONENT
 
 const Form = ({
   username,
@@ -64,31 +76,34 @@ const Form = ({
   password,
   setPassword,
   label,
-  handleSubmit,
+  onSubmit,
+  idPrefix,
 }) => {
   return (
     <div className="auth-container">
-      <form>
-        <h2 id="label">{label}</h2>
+      <form onSubmit={onSubmit}>
+        <h2 id={`${idPrefix}-label`}>{label}</h2>
 
         <div className="form-group">
-          <label htmlFor="username">Username:</label>
+          <label htmlFor={`${idPrefix}-username`}>Username:</label>
           <input
             type="text"
-            id="username"
+            id={`${idPrefix}-username`}
+            value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password:</label>
+          <label htmlFor={`${idPrefix}-password`}>Password:</label>
           <input
-            type="text"
-            id="username"
+            type="password"
+            id={`${idPrefix}-password`}
+            value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        <button type="submit"></button>
+        <button type="submit">{label}</button>
       </form>
     </div>
   );
